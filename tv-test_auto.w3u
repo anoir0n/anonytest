@@ -1,5 +1,5 @@
 {
-  "name": "TV-Test Automated Playlist",
+  "name": "TV-Test Automated Playlist (Lao IP Proxy)",
   "author": "TV-Test Auto Generator",
   "stations": [
     {
@@ -8,7 +8,9 @@
       "httpHeaders": {
         "User-Agent": "LaoTV/1.0 (Linux; Android 12; LA; com.laotv.app) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
         "Referer": "http://localhost/",
-        "Origin": "http://localhost/"
+        "Origin": "http://localhost/",
+        "X-Forwarded-For": "115.84.112.1",
+        "X-Real-IP": "115.84.112.1"
       }
     },
     {
@@ -17,7 +19,9 @@
       "httpHeaders": {
         "User-Agent": "LaoTV/1.0 (Linux; Android 12; LA; com.laotv.app) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
         "Referer": "http://localhost/",
-        "Origin": "http://localhost/"
+        "Origin": "http://localhost/",
+        "X-Forwarded-For": "115.84.112.1",
+        "X-Real-IP": "115.84.112.1"
       }
     }
   ]
