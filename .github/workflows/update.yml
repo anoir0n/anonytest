@@ -2,8 +2,12 @@ name: Auto Update TV-Test Playlist
 
 on:
   schedule:
-    - cron: '0 */3 * * *' # รันอัตโนมัติทุกๆ 3 ชั่วโมง
-  workflow_dispatch: # เปิดให้กดสั่งรันแบบ Manual ได้เอง
+    - cron: '0 * * * *' # สั่งทำงานอัตโนมัติทุกๆ 1 ชั่วโมง
+  workflow_dispatch: # เปิดให้กดสั่งรันแบบ Manual ได้เองเหมือนเดิม
+
+# 🌟 เพิ่มส่วนนี้เข้าไปเพื่อปลดล็อกสิทธิ์การเขียนไฟล์ (Write Permission) ให้กับบอท
+permissions:
+  contents: write
 
 jobs:
   update-playlist:
