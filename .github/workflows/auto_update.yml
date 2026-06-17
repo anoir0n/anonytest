@@ -2,15 +2,14 @@ name: Auto Update Playlists
 
 on:
   schedule:
-    # ตั้งค่าให้ระบบตรวจจับและอัปเดต Token ทุกๆ 3 ชั่วโมงอัตโนมัติ
     - cron: '0 */3 * * *'
-  workflow_dispatch: # เปิดปุ่มแมนนวลให้เรากดสั่งรันเองเมื่อไหร่ก็ได้
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # เปิดสิทธิ์ให้ GitHub Actions บันทึกและเขียนไฟล์ลงคลังได้
+      contents: write
 
     steps:
     - name: Checkout Repository
@@ -33,12 +32,18 @@ jobs:
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add playlist.m3u playlist.w3u
         
-        # ตรวจสอบว่าลิงก์มีการเปลี่ยนจริงไหม ถ้าไม่เปลี่ยนจะไม่บันทึกซ้ำเพื่อไม่ให้รกประวัติ
-        if git diff --staged --quiet; then
-          echo "Token ยังเป็นตัวเดิม ไม่มีการเปลี่ยนแปลง"
+        # สั่งเช็กว่ามีไฟล์สร้างขึ้นมาจริงไหม ก่อนที่จะทำการสั่งกดยืนยัน (Commit)
+        if [ -f playlist.m3u ] && [ -f playlist.w3u ]; then
+          git add playlist.m3u playlist.w3u
+          
+          if git diff --staged --quiet; then
+            echo "ไม่มีการเปลี่ยนแปลงของ Token"
+          else
+            git commit -m "Auto-updated playlist tokens [skip ci]"
+            git push
+          fi
         else
-          git commit -m "Auto-updated playlist tokens [skip ci]"
-          git push
+          echo "Error: ไม่พบไฟล์เพลย์ลิสต์สำหรับอัปเดต"
+          exit 1
         fi
