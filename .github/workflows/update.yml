@@ -1,0 +1,29 @@
+name: Auto Update TV-Test Playlist
+
+on:
+  schedule:
+    - cron: '0 */3 * * *' # รันอัตโนมัติทุกๆ 3 ชั่วโมง
+  workflow_dispatch: # เปิดให้กดสั่งรันแบบ Manual ได้เอง
+
+jobs:
+  update-playlist:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Run Script
+      run: python automate_tv_test.py
+
+    - name: Commit and Push Changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add tv-test_auto.w3u tv-test_auto.m3u
+        git commit -m "Auto-update TV-Test playlists: $(date)" || exit 0
+        git push
