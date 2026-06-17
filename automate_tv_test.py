@@ -3,10 +3,13 @@ import urllib.request
 
 JSON_URL = "https://tv.laoid.net/world-cup/config.json"
 OUTPUT_W3U_FILE = "tv-test_auto.w3u"
-OUTPUT_M3U_FILE = "tv-test_auto.m3u"
+OUTPUT_M3U_FILE = "tv-test_auto.m3u8"  # เปลี่ยนนามสกุลเป็น .m3u8 ตามต้องการ
 
-# ใช้ค่า User-Agent เดิมของ LaoTV เพื่อให้ระบบปลายทางไม่บล็อกการเล่นสตรีม
+# ใช้ค่า User-Agent เดิมของ LaoTV
 USER_AGENT = "LaoTV/1.0 (Linux; Android 12; LA; com.laotv.app) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+
+# สุ่มหรือระบุ IP ของประเทศลาว (Lao IP Address) เพื่อหลอกระบบ Geo-block
+LAO_IP = "115.84.112.1" 
 
 def fetch_and_convert():
     try:
@@ -17,14 +20,13 @@ def fetch_and_convert():
             raw_data = response.read().decode('utf-8')
             data = json.loads(raw_data)
         
-        # เตรียมโครงสร้างสำหรับ .w3u (Wiseplay) ชื่อเพลย์ลิสต์ด้านในเป็น TV-Test
         w3u_data = {
-          "name": "TV-Test Automated Playlist",
+          "name": "TV-Test Automated Playlist (Lao IP Proxy)",
           "author": "TV-Test Auto Generator",
           "stations": []
         }
         
-        # เตรียมโครงสร้างสำหรับ .m3u (IPTV ทั่วไป)
+        # จัดเตรียมรูปแบบ M3U8 มาตรฐาน
         m3u_lines = ["#EXTM3U"]
         
         items = []
@@ -58,34 +60,45 @@ def fetch_and_convert():
                 stream_url = item.get('Url', item.get('url', item.get('link', '')))
             
             if stream_url:
-                # --- จัดการข้อมูลสำหรับ .w3u ---
+                # --- จัดการข้อมูลสำหรับ .w3u (Wiseplay) ---
                 station = {
                     "name": channel_name,
                     "url": stream_url,
                     "httpHeaders": {
                         "User-Agent": USER_AGENT,
                         "Referer": "http://localhost/",
-                        "Origin": "http://localhost/"
+                        "Origin": "http://localhost/",
+                        "X-Forwarded-For": LAO_IP,
+                        "X-Real-IP": LAO_IP
                     }
                 }
                 w3u_data["stations"].append(station)
 
-                # --- จัดการข้อมูลสำหรับ .m3u ---
+                # --- จัดการข้อมูลสำหรับ .m3u8 (IPTV ทั่วไป) ---
+                # ใส่รายละเอียด Header แบบฝังในบรรทัดเพื่อความเข้ากันได้สูงกับแอป เช่น OTT Navigator, Perfect Player, TiviMate
                 m3u_lines.append(f'#EXTINF:-1 tvg-name="{channel_name}",{channel_name}')
+                
+                # มาตรฐาน VLC / IPTV Player options
                 m3u_lines.append(f'#EXTVLCOPT:http-user-agent={USER_AGENT}')
                 m3u_lines.append('#EXTVLCOPT:http-referrer=http://localhost/')
                 m3u_lines.append('#EXTVLCOPT:http-origin=http://localhost/')
-                m3u_lines.append(stream_url)
+                m3u_lines.append(f'#EXTVLCOPT:http-header=X-Forwarded-For: {LAO_IP}')
+                m3u_lines.append(f'#EXTVLCOPT:http-header=X-Real-IP: {LAO_IP}')
+                
+                # เพิ่มรูปแบบจัดส่ง Header ท้าย URL (ช่วยให้บางแอปที่ไม่อ่าน #EXTVLCOPT ทำงานได้)
+                # โดยเฉพาะแอปยุคใหม่จะชอบโครงสร้างแบบ URL|User-Agent=...
+                appended_url = f"{stream_url}|User-Agent={USER_AGENT}&X-Forwarded-For={LAO_IP}&X-Real-IP={LAO_IP}&Referer=http://localhost/"
+                m3u_lines.append(appended_url)
         
         # บันทึกไฟล์ .w3u
         with open(OUTPUT_W3U_FILE, 'w', encoding='utf-8') as f:
             json.dump(w3u_data, f, ensure_ascii=False, indent=2)
             
-        # บันทึกไฟล์ .m3u
+        # บันทึกไฟล์ .m3u8
         with open(OUTPUT_M3U_FILE, 'w', encoding='utf-8') as f:
             f.write("\n".join(m3u_lines))
             
-        print(f"สร้างไฟล์สำเร็จ! ทั้งแบบ .w3u และ .m3u รวม {len(w3u_data['stations'])} ช่อง")
+        print(f"สร้างไฟล์สำเร็จ! ทั้งแบบ .w3u และ .m3u8 รวม {len(w3u_data['stations'])} ช่อง")
 
     except Exception as e:
         print(f"เกิดข้อผิดพลาด: {e}")
