@@ -30,9 +30,7 @@ def fetch_m3u8_links():
 
         # --- ส่วนจำลองข้อมูล (คุณสามารถลบส่วนนี้ออกเมื่อต่อ API จริงสำเร็จ) ---
         mock_extracted_channels = [
-            {"name": "Live ช่อง 1", "url": "https://example.com/live/stream1/playlist.m3u8", "image": "https://example.com/logo1.png"},
-            {"name": "Live ช่อง 2", "url": "https://example.com/live/stream2/playlist.m3u8", "image": "https://example.com/logo2.png"}
-        ]
+    ]
         return mock_extracted_channels
         # -----------------------------------------------------------------
 
