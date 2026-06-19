@@ -2,71 +2,91 @@ import requests
 import json
 import os
 
-# ==================== ส่วนที่ต้องแก้ไขตามแอปของคุณ ====================
-# เปลี่ยนเป็น URL API หลังบ้านของ AppCreator24 ที่คุณดักจับได้
-API_URL = "https://html5.appcreator24.com/srv/get_links.php"
+# ==================== ส่วนที่ต้องแก้ไขหลังดักจับเซิร์ฟเวอร์จริงได้ ====================
+# เปลี่ยนเป็น URL Config/API หลังบ้านของ AppCreator24 ที่คุณดักจับได้ตอนเปิดแอป
+API_URL = "https://html5.appcreator24.com/srv/get_config.php"  
 
-# ปลอมตัวเป็นแอปพลิเคชันโดยใส่ Headers ที่ก๊อปปี้มาจากแอปจริง
+# ใช้ข้อมูลระบุตัวตน (Headers) ของแอปพลิเคชันจริงที่คุณอัปโหลดมา
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Linux; Android 11; AppCreator24)",
-    "X-Requested-With": "com.appcreator24.app4086696",  # ID ของแอปตัวนี้
+    "X-Requested-With": "com.appcreator24.app4086696",  # แพ็กเกจไอดีของแอปตัวนี้
     "Content-Type": "application/x-www-form-urlencoded"
 }
 
-# ข้อมูลที่แอปส่งไปขอลิงก์ (Payload)
+# ข้อมูลที่ส่งไปขอรายการช่องทั้งหมด (Payload)
 PAYLOAD = {
     "idapp": "4086696",
-    "action": "get_streams"
+    "action": "get_full_list"
 }
-# ==================================================================
+# ==============================================================================
 
-def fetch_m3u8_links():
-    print("กำลังส่งคำขอแบบปลอมตัวเป็นแอป...")
+def fetch_rtmp_streams():
+    print("🤖 กำลังปลอมตัวเป็นแอปเพื่อขอลิงก์ RTMP จากเซิร์ฟเวอร์...")
     try:
-        # ในการใช้งานจริง ให้เปิดคอมเมนต์ 3 บรรทัดล่างนี้เพื่อต่อกับเซิร์ฟเวอร์จริง
-        # response = requests.post(API_URL, headers=HEADERS, data=PAYLOAD, timeout=10)
-        # result = response.json() 
-        # return result['channels']
+        # เปิดใช้งาน 3 บรรทัดล่างนี้เมื่อได้ลิงก์ API_URL จริงจากการดักจับทราฟฟิก
+        # response = requests.post(API_URL, headers=HEADERS, data=PAYLOAD, timeout=15)
+        # response_data = response.json()
+        # return response_data.get('streams', [])
 
-        # --- ส่วนจำลองข้อมูล (คุณสามารถลบส่วนนี้ออกเมื่อต่อ API จริงสำเร็จ) ---
-        mock_extracted_channels = [
-    ]
-        return mock_extracted_channels
+        # -----------------------------------------------------------------
+        # ส่วนจำลองข้อมูลสตรีม RTMP (คุณสามารถลบส่วนนี้ออกเมื่อต่อ API จริงสำเร็จ)
+        # ตัวอย่างนี้แสดงให้เห็นว่า .w3u สามารถใส่ลิงก์ rtmp:// หรือ .flv ได้โดยตรง
+        mock_rtmp_data = [
+            {
+                "title": "ช่องสตรีมสด RTMP 1", 
+                "stream_url": "rtmp://example.com/live/stream1", 
+                "logo": "https://example.com/logo1.png"
+            },
+            {
+                "title": "ช่องสตรีมสด FLV 2", 
+                "stream_url": "http://example.com/live/stream2.flv", 
+                "logo": "https://example.com/logo2.png"
+            }
+        ]
+        return mock_rtmp_data
         # -----------------------------------------------------------------
 
     except Exception as e:
-        print(f"เกิดข้อผิดพลาดในการดึงข้อมูล: {e}")
+        print(f"❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: {e}")
         return []
 
-def convert_to_w3u(channels):
-    print("กำลังแปลงข้อมูลเป็นรูปแบบ StreamHub.w3u (Wiseplay Format)...")
+def generate_w3u_playlist(stream_list):
+    print("📝 กำลังแปลงข้อมูลสตรีมสดเป็นรูปแบบ StreamHub.w3u (Wiseplay Format)...")
     
-    # โครงสร้างพื้นฐานของไฟล์ .w3u
+    # โครงสร้างพื้นฐานของไฟล์ .w3u สำหรับแอปเครื่องเล่น
     w3u_structure = {
-        "name": "StreamHub Playlist",
+        "name": "StreamHub RTMP Live",
         "author": "GitHub Automation",
         "image": "https://wiseplay.tv/img/logo.png",
         "stations": []
     }
     
-    # วนลูปนำลิงก์ m3u8 ใส่เข้าไป
-    for ch in channels:
-        station = {
-            "name": ch["name"],
-            "image": ch.get("image", ""),
-            "url": ch["url"]
-        }
-        w3u_structure["stations"].append(station)
+    # วนลูปอ่านค่าดึงสตรีมและแปลงเข้าโครงสร้าง Wiseplay
+    for stream in stream_list:
+        # ดึงค่า URL (ตรวจสอบให้ตรงกับคีย์ที่ระบบจริงส่งกลับมา เช่น 'stream_url' หรือ 'url')
+        url = stream.get("stream_url", "")
+        name = stream.get("title", "Unknown Channel")
+        image = stream.get("logo", "")
         
-    # บันทึกออกเป็นไฟล์ StreamHub.w3uตามที่ต้องการ
-    with open("StreamHub.w3u", "w", encoding="utf-8") as f:
+        # คัดกรองเฉพาะช่องที่มี URL สตรีมส่งมา
+        if url:
+            station = {
+                "name": name,
+                "image": image,
+                "url": url  # ใส่ rtmp://... หรือ .flv ได้โดยตรงเลย Wiseplay รองรับ
+            }
+            w3u_structure["stations"].append(station)
+            
+    # บันทึกไฟล์ออกมาในโฟลเดอร์หลักของโปรเจกต์
+    output_filename = "StreamHub.w3u"
+    with open(output_filename, "w", encoding="utf-8") as f:
         json.dump(w3u_structure, f, ensure_ascii=False, indent=4)
         
-    print("สร้างไฟล์ StreamHub.w3u เรียบร้อยแล้ว!")
+    print(f"✅ บันทึกไฟล์สำเร็จ! ได้รับทั้งหมด {len(w3u_structure['stations'])} ช่อง")
 
 if __name__ == "__main__":
-    extracted_data = fetch_m3u8_links()
-    if extracted_data:
-        convert_to_w3u(extracted_data)
+    streams = fetch_rtmp_streams()
+    if streams:
+        generate_w3u_playlist(streams)
     else:
-        print("ไม่พบข้อมูลช่องรายการ")
+        print("⚠️ ไม่พบข้อมูลสตรีมที่ดึงมาได้")
