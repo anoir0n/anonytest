@@ -1,0 +1,17 @@
+{
+    "name": "StreamHub RTMP Live",
+    "author": "GitHub Automation",
+    "image": "https://wiseplay.tv/img/logo.png",
+    "stations": [
+        {
+            "name": "ช่องสตรีมสด RTMP 1",
+            "image": "https://example.com/logo1.png",
+            "url": "rtmp://example.com/live/stream1"
+        },
+        {
+            "name": "ช่องสตรีมสด FLV 2",
+            "image": "https://example.com/logo2.png",
+            "url": "http://example.com/live/stream2.flv"
+        }
+    ]
+}
