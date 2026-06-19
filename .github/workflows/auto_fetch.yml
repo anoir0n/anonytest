@@ -1,34 +1,32 @@
-name: StreamHub Auto RTMP Fetcher
+name: StreamHub Auto App Emulator
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # รันอัตโนมัติทุกๆ 6 ชั่วโมง (ปรับเวลาได้ตามต้องการ)
-  workflow_dispatch:      # เปิดให้มีปุ่มกดสั่งรันเองได้ทันทีผ่านหน้าเว็บ GitHub
+    - cron: '0 */6 * * *'  # สั่งให้ระบบตื่นมารันดึงลิงก์ใหม่ทุกๆ 6 ชั่วโมง
+  workflow_dispatch:      # เปิดปุ่มให้เรากดรันเองได้แบบ Manual
 
 jobs:
-  run-streamhub:
+  build-and-run:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Set up Python
+    - name: Setup Python environment
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
 
-    - name: Install Dependencies
-      run: |
-        pip install requests
+    - name: Install Requests library
+      run: pip install requests
 
-    - name: Execute StreamHub Script
+    - name: Run Emulator Script
       run: python StreamHub.py
 
-    - name: Commit and Push Updated Playlist
+    - name: Commit and Push to Repository
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git add StreamHub.w3u
-        # เช็กว่าไฟล์มีการเปลี่ยนแปลงจริงไหม ถ้าจริงให้เซฟทับตัวเก่าขึ้นคลัง GitHub
-        git diff-index --quiet HEAD || git commit -m "Auto-refresh StreamHub.w3u RTMP list"
+        git diff-index --quiet HEAD || git commit -m "Auto-update all streams to StreamHub.w3u"
         git push
