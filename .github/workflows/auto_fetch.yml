@@ -1,0 +1,34 @@
+name: Auto Fetch Stream to W3U
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # สั่งรันอัตโนมัติทุกๆ 6 ชั่วโมง
+  workflow_dispatch:      # เปิดปุ่มให้สามารถกดรันเองแบบ Manual ได้
+
+jobs:
+  update-playlist:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Dependencies
+      run: |
+        pip install requests
+
+    - name: Run StreamHub Script
+      run: python StreamHub.py
+
+    - name: Commit and Push StreamHub.w3u
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add StreamHub.w3u
+        # ตรวจสอบว่าไฟล์มีการเปลี่ยนแปลงจริงไหม ถ้ามีให้ทำการอัปเดตขึ้น GitHub
+        git diff-index --quiet HEAD || git commit -m "Auto-update StreamHub.w3u"
+        git push
