@@ -1,15 +1,1 @@
 #EXTM3U
-#EXTINF:-1 tvg-name="LaoTV Football",LaoTV Football
-#EXTVLCOPT:http-user-agent=LaoTV/1.0 (Linux; Android 12; LA; com.laotv.app) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36
-#EXTVLCOPT:http-referrer=https://tv.laoid.net/world-cup
-#EXTVLCOPT:http-origin=https://tv.laoid.net/world-cup
-#EXTVLCOPT:http-header=X-Forwarded-For: 115.84.112.1
-#EXTVLCOPT:http-header=X-Real-IP: 115.84.112.1
-https://ctrl.laotv.la/tokenlive/LaoTV_Football/index.m3u8?va=1786523413&token=c974fe8a1c39f8aeb90e|User-Agent=LaoTV/1.0 (Linux; Android 12; LA; com.laotv.app) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36&X-Forwarded-For=115.84.112.1&X-Real-IP=115.84.112.1&Referer=https://tv.laoid.net/world-cup
-#EXTINF:-1 tvg-name="LaoTV Entertainment",LaoTV Entertainment
-#EXTVLCOPT:http-user-agent=LaoTV/1.0 (Linux; Android 12; LA; com.laotv.app) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36
-#EXTVLCOPT:http-referrer=https://tv.laoid.net/world-cup
-#EXTVLCOPT:http-origin=https://tv.laoid.net/world-cup
-#EXTVLCOPT:http-header=X-Forwarded-For: 115.84.112.1
-#EXTVLCOPT:http-header=X-Real-IP: 115.84.112.1
-https://ctrl.laotv.la/tokenlive/LaoTV_Entertainment/index.m3u8?va=1786523301&token=0a273144ad094a68c2cd|User-Agent=LaoTV/1.0 (Linux; Android 12; LA; com.laotv.app) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36&X-Forwarded-For=115.84.112.1&X-Real-IP=115.84.112.1&Referer=https://tv.laoid.net/world-cup
